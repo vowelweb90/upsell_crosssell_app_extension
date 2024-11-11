@@ -1,8 +1,9 @@
 import toast from "react-hot-toast";
 import { cardDiscountCodesUpdate } from "../graphql/mutations/cardDiscountCodesUpdate";
 import { cart } from "../graphql/queries/cart";
+import { ResponseDiscountData } from "../../types";
 
-export const updateCartDiscountCodes = async (discountData: { discountCodes: string[] }) => {
+export const updateCartDiscountCodes = async (discountData: ResponseDiscountData) => {
   try {
     const shopUrl = `https://${window.location.host}`;
     const storeFrontAccessToken = import.meta.env.VITE_STOREFRONT_ACCESS_TOKEN;
@@ -15,8 +16,6 @@ export const updateCartDiscountCodes = async (discountData: { discountCodes: str
     const cartRes = await fetch(`${shopUrl}/cart.js`);
     const cartData = await cartRes.json();
 
-    console.log("cartData: ", cartData);
-
     const cartId = "gid://shopify/Cart/" + cartData.token;
     const cartReqData = {
       query: cart,
@@ -24,8 +23,6 @@ export const updateCartDiscountCodes = async (discountData: { discountCodes: str
         id: cartId,
       },
     };
-
-    console.log("cartId: ", cartId);
 
     // Check Cart Exists
     const cartIdRes = await fetch(`${shopUrl}/api/2024-10/graphql.json`, {
@@ -39,7 +36,7 @@ export const updateCartDiscountCodes = async (discountData: { discountCodes: str
     const cartDiscountCodesUpdate = {
       query: cardDiscountCodesUpdate,
       variables: {
-        discountCodes: discountData.discountCodes,
+        discountCodes: [discountData.code],
         id: cartId,
       },
     };

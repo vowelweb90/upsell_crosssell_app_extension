@@ -5,9 +5,9 @@ import { Plus } from "lucide-react";
 import OfferProductsList from "./OfferProductsList";
 import { fetchOffers } from "../actions/fetchOffers";
 import toast from "react-hot-toast";
-// import addProductsToCart from "../actions/addProductsToCart";
+import addProductsToCart from "../actions/addProductsToCart";
 import createDiscountCode from "../actions/createDiscountCode";
-// import { updateCartDiscountCodes } from "../actions/updateCartDiscountCodes";
+import { updateCartDiscountCodes } from "../actions/updateCartDiscountCodes";
 
 export default function FreqBoughtTogether() {
   const [offer, setOffer] = useState<Offer | null | undefined>();
@@ -51,30 +51,32 @@ export default function FreqBoughtTogether() {
     try {
       if (offerIsApplied && offer) {
         // Create discount for offer products
-        await createDiscountCode(offer, selectedOfferProducts, totalPrice);
 
-        // const { success, discountData } = await createDiscountCode(
-        //   offer,
-        //   selectedOfferProducts,
-        //   totalPrice
-        // );
+        const { success, discountData } = await createDiscountCode(
+          offer,
+          selectedOfferProducts,
+          totalPrice
+        );
 
-        // // If discount codes were successfully created
-        // if (success && discountData && import.meta.env.PROD) {
-        //   let data;
-        //   // Add Offer Products to cart
-        //   if (success) data = await addProductsToCart(selectedOfferProducts);
+        // If discount codes were successfully created
+        if (success && discountData && import.meta.env.PROD) {
+          // Save discount data to localStorage
+          localStorage.setItem("vw-upsell-crosssell-discount", JSON.stringify(discountData));
 
-        //   console.log("AddToCart data: ", data);
+          let data;
+          // Add Offer Products to cart
+          if (success) data = await addProductsToCart(selectedOfferProducts);
 
-        //   // Update discount codes in cart
-        //   const updateCartResponse = await updateCartDiscountCodes(discountData);
+          console.log("AddToCart data: ", data);
 
-        //   // Navigate to Cart
-        //   if (updateCartResponse) {
-        //     window.location.href = "/cart";
-        //   }
-        // }
+          // Update discount codes in cart
+          const updateCartResponse = await updateCartDiscountCodes(discountData);
+
+          // Navigate to Cart
+          if (updateCartResponse) {
+            window.location.href = "/cart";
+          }
+        }
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");

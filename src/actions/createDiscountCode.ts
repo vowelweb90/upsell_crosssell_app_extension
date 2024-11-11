@@ -1,13 +1,16 @@
 import toast from "react-hot-toast";
-import { Offer, SelectableOfferProduct } from "../../types";
+import { Offer, ResponseDiscountData, SelectableOfferProduct, WindowType } from "../../types";
 
 export const createDiscountCode = async (
   offer: Offer,
   selectableOfferProducts: SelectableOfferProduct[],
   totalPrice: number
-): Promise<{ success: boolean; discountData?: { discountCodes: string[] } }> => {
+): Promise<{ success: boolean; discountData?: ResponseDiscountData }> => {
   try {
     let value = null;
+    const windowObj = window as WindowType;
+    const productId = windowObj.ShopifyAnalytics.meta.product.gid;
+    console.log('productId: ', productId);
 
     if (offer.discount.type === "PERCENTAGE_OR_FIXED") {
       value = {
@@ -42,7 +45,9 @@ export const createDiscountCode = async (
       value,
       items,
       shop: shopDomain,
+      triggerProduct: productId,
     };
+    console.log('discountData.triggerProduct: ', discountData.triggerProduct);
 
     console.log("discountData: ", discountData);
 

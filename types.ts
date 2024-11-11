@@ -102,3 +102,14 @@ export interface Cart {
   items_added: CartItem[];
   items_removed: CartItem[];
 }
+
+export type ResponseDiscountData = {
+  id: string;
+  endsAt: string;
+  code: string;
+  triggerProduct: string;
+  value: { percentage: number } | { discountAmount: { amount: number } };
+  items: {
+    products: { id: string; title: string }[];
+  };
+};
