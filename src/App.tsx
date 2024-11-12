@@ -3,7 +3,9 @@ import "./App.css";
 import { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { WindowType } from "../types";
-import { registerCartChangeListeners } from "./utils/lib";
+import { registerCartChangeListeners } from "./utils/registerCartChangeListeners";
+// import { validateAndFetchDiscount } from "./utils/validateAndFetchDisocunt";
+// import { getCart } from "./actions/getCart";
 
 function App() {
   const productsPath = "/products";
@@ -28,6 +30,14 @@ function App() {
         console.log("Path set to products");
         setPath(productsPath);
       }
+      // if (
+      //   windowObj.ShopifyAnalytics.meta.page.pageType === "cart" ||
+      //   window.location.href.includes(cartPath)
+      // ) {
+      //   getCart().then((cartData) => {
+      //     validateAndFetchDiscount(cartData);
+      //   });
+      // }
 
       console.log("Registered Cart change listeners");
       registerCartChangeListeners(import.meta.env.VITE_STOREFRONT_ACCESS_TOKEN || "");

@@ -2,9 +2,9 @@ import { Offer } from "../../types";
 
 export const offers: Offer[] = [
   {
-    _id: "672b1d459a398dc32318a0ba",
+    _id: "67332e9d7a6d32172c05a994",
     formType: "FREQ_BOUGHT_TOGETHER",
-    offerName: "Test offer 2",
+    offerName: "adfsdafsdaf",
     triggerType: "SPECIFIC_PRODUCTS",
     specificTriggerProducts: [
       {
@@ -16,7 +16,22 @@ export const offers: Offer[] = [
         price: 749.95,
         comparePrice: null,
         variantId: "gid://shopify/ProductVariant/41965652803673",
-        _id: "672b1d459a398dc32318a0bb",
+        _id: "67332e9d7a6d32172c05a995",
+      },
+    ],
+    tags: [],
+    offerProductsType: "MANUAL",
+    specificOfferProducts: [
+      {
+        id: "gid://shopify/Product/7823628370009",
+        name: "The 3p Fulfilled Snowboard",
+        url: "https://samirbante-vw.myshopify.com/products/the-3p-fulfilled-snowboard",
+        imgURL:
+          "https://cdn.shopify.com/s/files/1/0618/6916/2585/files/Main_b9e0da7f-db89-4d41-83f0-7f417b02831d.jpg?v=1730877288",
+        price: 2629.95,
+        comparePrice: 0,
+        variantId: "gid://shopify/ProductVariant/41965652770905",
+        _id: "67332e9d7a6d32172c05a996",
       },
       {
         id: "gid://shopify/Product/7823628304473",
@@ -25,12 +40,40 @@ export const offers: Offer[] = [
         imgURL:
           "https://cdn.shopify.com/s/files/1/0618/6916/2585/files/Main_d624f226-0a89-4fe1-b333-0d1548b43c06.jpg?v=1730877287",
         price: 1025,
-        comparePrice: null,
+        comparePrice: 0,
         variantId: "gid://shopify/ProductVariant/41965652672601",
-        _id: "672b1d459a398dc32318a0bc",
+        _id: "67332e9d7a6d32172c05a997",
+      },
+      {
+        id: "gid://shopify/Product/7823628173401",
+        name: "The Compare at Price Snowboard",
+        url: "https://samirbante-vw.myshopify.com/products/the-compare-at-price-snowboard",
+        imgURL:
+          "https://cdn.shopify.com/s/files/1/0618/6916/2585/files/snowboard_sky.png?v=1730877287",
+        price: 785.95,
+        comparePrice: 885.95,
+        variantId: "gid://shopify/ProductVariant/41965652312153",
+        _id: "67332e9d7a6d32172c05a998",
       },
     ],
-    tags: [],
+    AutomaticOfferProductsCount: 2,
+    discount: null,
+    widgetTitle: "",
+    offerPriority: 2,
+    shopUrl: "upsell-crosssell-store.myshopify.com",
+    createdAt: "2024-11-12T10:31:57.369Z",
+
+    updatedAt: "2024-11-12T10:31:57.369Z",
+
+    __v: 0,
+  },
+  {
+    _id: "6733324b0b29fc7de228c49d",
+    formType: "FREQ_BOUGHT_TOGETHER",
+    offerName: "shsghgh",
+    triggerType: "TAGS",
+    specificTriggerProducts: [],
+    tags: ["winter", "sport"],
     offerProductsType: "MANUAL",
     specificOfferProducts: [
       {
@@ -42,7 +85,7 @@ export const offers: Offer[] = [
         price: 1025,
         comparePrice: 0,
         variantId: "gid://shopify/ProductVariant/41965652672601",
-        _id: "672b1d459a398dc32318a0bd",
+        _id: "6733324b0b29fc7de228c49e",
       },
       {
         id: "gid://shopify/Product/7823628173401",
@@ -53,7 +96,7 @@ export const offers: Offer[] = [
         price: 785.95,
         comparePrice: 885.95,
         variantId: "gid://shopify/ProductVariant/41965652312153",
-        _id: "672b1d459a398dc32318a0be",
+        _id: "6733324b0b29fc7de228c49f",
       },
     ],
     AutomaticOfferProductsCount: 2,
@@ -64,17 +107,17 @@ export const offers: Offer[] = [
         amount: 15,
         unit: "PERCENT",
       },
-      discountText: "",
+      discountText: "asdf",
       discountCombinations: [],
-      _id: "672b1d459a398dc32318a0bf",
+      _id: "6733324b0b29fc7de228c4a0",
     },
-
     widgetTitle: "",
-    offerPriority: 2,
-    storeURL: "upsell-crosssell-store.myshopify.com",
-    createdAt: "2024-11-06T07:39:49.730Z",
+    offerPriority: 3,
+    shopUrl: "upsell-crosssell-store.myshopify.com",
+    createdAt: "2024-11-12T10:47:39.311Z",
 
-    updatedAt: "2024-11-06T07:39:49.730Z",
+    updatedAt: "2024-11-12T10:47:39.311Z",
+
     __v: 0,
   },
 ];

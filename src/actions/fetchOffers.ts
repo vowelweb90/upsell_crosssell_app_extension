@@ -6,16 +6,17 @@ export const fetchOffers = async (types: string[]) => {
   const productId = import.meta.env.PROD
     ? windowObj.ShopifyAnalytics.meta.product.gid
     : "gid://shopify/Product/9666044035377";
-  const shopURL = import.meta.env.PROD
+  const shopUrl = import.meta.env.PROD
     ? window.location.host
     : import.meta.env.VITE_DEV_STORE + ".myshopify.com";
   try {
-    const encodedShopURL = encodeURIComponent(shopURL);
+    const encodedShopUrl = encodeURIComponent(shopUrl);
     const encodedProductId = encodeURIComponent(productId);
+    const offerTypes = ["SPECIFIC_PRODUCTS", "TAGS", "ALL_PRODUCTS"];
 
     if (productId) {
       const res = await fetch(
-        `https://${shopURL}/apps/upsell_crosssell/api/offers?productId=${encodedProductId}&formTypes=${types}&shopUrl=${encodedShopURL}`
+        `https://${shopUrl}/apps/upsell_crosssell/api/extension/offers?productId=${encodedProductId}&formTypes=${types}&types=${offerTypes}&shopUrl=${encodedShopUrl}`
       );
 
       const data: Offer[] = await res.json();

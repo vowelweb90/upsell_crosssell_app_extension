@@ -44,10 +44,10 @@ export interface Offer {
   offerProductsType: OfferProductsType;
   specificOfferProducts: Product[];
   AutomaticOfferProductsCount: number;
-  discount: Discount;
+  discount: Discount | undefined | null;
   widgetTitle: string;
   offerPriority: number;
-  storeURL: string;
+  shopUrl: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -58,7 +58,8 @@ export type WindowType = Window &
     Shopify: any;
     ShopifyAnalytics: any;
     vw_upsell_crosssell: {
-      freqBoughtTogetherBlockPresent: true;
+      freqBoughtTogetherBlockPresent: boolean;
+      discountDeleted: boolean;
     };
   };
 

@@ -10,9 +10,9 @@ export const createDiscountCode = async (
     let value = null;
     const windowObj = window as WindowType;
     const productId = windowObj.ShopifyAnalytics.meta.product.gid;
-    console.log('productId: ', productId);
+    console.log("productId: ", productId);
 
-    if (offer.discount.type === "PERCENTAGE_OR_FIXED") {
+    if (offer.discount?.type === "PERCENTAGE_OR_FIXED") {
       value = {
         type: offer.discount.percentageFixValue.unit,
         amount: offer.discount.percentageFixValue.amount,
@@ -20,9 +20,10 @@ export const createDiscountCode = async (
     }
 
     const combinesWith = {
-      productDiscounts: offer.discount.discountCombinations.includes("productDiscounts"),
-      orderDiscounts: offer.discount.discountCombinations.includes("orderDiscounts"),
-      shippingDiscounts: offer.discount.discountCombinations.includes("shippingDiscounts"),
+      productDiscounts: offer.discount?.discountCombinations.includes("productDiscounts") || false,
+      orderDiscounts: offer.discount?.discountCombinations.includes("orderDiscounts") || false,
+      shippingDiscounts:
+        offer.discount?.discountCombinations.includes("shippingDiscounts") || false,
     };
 
     let items: string[] = [];
@@ -39,7 +40,7 @@ export const createDiscountCode = async (
     const shopUrl = `https://${shopDomain}`;
 
     const discountData = {
-      title: offer.discount.discountText || "",
+      title: offer.discount?.discountText || "",
       minimumQuantity: totalPrice,
       combinesWith,
       value,
@@ -47,7 +48,7 @@ export const createDiscountCode = async (
       shop: shopDomain,
       triggerProduct: productId,
     };
-    console.log('discountData.triggerProduct: ', discountData.triggerProduct);
+    console.log("discountData.triggerProduct: ", discountData.triggerProduct);
 
     console.log("discountData: ", discountData);
 

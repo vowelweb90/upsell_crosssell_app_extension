@@ -1,5 +1,5 @@
 import { FormEvent, FormEventHandler, useEffect, useState } from "react";
-import { Offer, Product, SelectableOfferProduct } from "../../types";
+import { Offer, Product, SelectableOfferProduct, WindowType } from "../../types";
 import { percentFormatter, rupeeFormatter } from "../utils/lib";
 import { Plus } from "lucide-react";
 import OfferProductsList from "./OfferProductsList";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import addProductsToCart from "../actions/addProductsToCart";
 import createDiscountCode from "../actions/createDiscountCode";
 import { updateCartDiscountCodes } from "../actions/updateCartDiscountCodes";
+import { getProduct } from "../actions/getProduct";
 
 export default function FreqBoughtTogether() {
   const [offer, setOffer] = useState<Offer | null | undefined>();
@@ -17,7 +18,8 @@ export default function FreqBoughtTogether() {
   const totalPrice =
     selectedOfferProducts.reduce((acc, p) => (p.checked ? p.price + acc : acc), 0) || 0;
   const [discountAmount, setDiscountAmount] = useState(0);
-  const discountedTotalPrice = offerIsApplied ? totalPrice - discountAmount : totalPrice;
+  const discountedTotalPrice =
+    offerIsApplied && offer?.discount?.type ? totalPrice - discountAmount : totalPrice;
   const types = [
     "FREQ_BOUGHT_TOGETHER",
     "PRODUCT_ADDONS",
@@ -51,28 +53,31 @@ export default function FreqBoughtTogether() {
     try {
       if (offerIsApplied && offer) {
         // Create discount for offer products
+        if (offer.discount?.type) {
+          const { success, discountData } = await createDiscountCode(
+            offer,
+            selectedOfferProducts,
+            totalPrice
+          ); // If discount codes were successfully created
+          if (success && discountData && import.meta.env.PROD) {
+            // Save discount data to localStorage
+            localStorage.setItem("vw-upsell-crosssell-discount", JSON.stringify(discountData));
 
-        const { success, discountData } = await createDiscountCode(
-          offer,
-          selectedOfferProducts,
-          totalPrice
-        );
+            // Add Offer Products to cart
+            await addProductsToCart(selectedOfferProducts);
 
-        // If discount codes were successfully created
-        if (success && discountData && import.meta.env.PROD) {
-          // Save discount data to localStorage
-          localStorage.setItem("vw-upsell-crosssell-discount", JSON.stringify(discountData));
+            // Update discount codes in cart
+            await updateCartDiscountCodes(discountData);
 
+            // Navigate to Cart
+            if (success) window.location.href = "/cart";
+          }
+        } else {
           // Add Offer Products to cart
-          if (success) await addProductsToCart(selectedOfferProducts);
-
-          // Update discount codes in cart
-          const updateCartResponse = await updateCartDiscountCodes(discountData);
+          await addProductsToCart(selectedOfferProducts);
 
           // Navigate to Cart
-          if (updateCartResponse) {
-            window.location.href = "/cart";
-          }
+          window.location.href = "/cart";
         }
       }
     } catch (error) {
@@ -86,28 +91,49 @@ export default function FreqBoughtTogether() {
       const { data: offersData, productId } = await fetchOffers(types);
 
       // setOffers(offersData || []);
+      offersData.sort((a, b) => b.offerPriority - a.offerPriority);
 
+      console.log("sortedOffers: ", offersData);
       if (offersData?.length) {
         setOffer(offersData[0]);
-
         if (offersData[0].specificOfferProducts.length) {
-          const selectableOfferProducts = offersData[0].specificOfferProducts
-            .filter((p: Product) => p.id !== productId)
-            .map((op: Product) => ({
-              ...op,
+          if (offersData[0].triggerType === "TAGS") {
+            const windowObj = window as WindowType
+            const product = await getProduct(windowObj.ShopifyAnalytics.meta.product.id)
+            let selectableOfferProducts = []
+            let currentProduct = null;
+            if (product.tags.some(t => offersData[0].tags?.includes(t))) {
+              // 
+              selectableOfferProducts = offersData[0].specificOfferProducts
+                .filter((p: Product) => p.id !== productId)
+                .map((op: Product) => ({
+                  ...op,
+                  disabled: false,
+                  checked: true,
+                })) as SelectableOfferProduct[];
+            }
+          }
+          if (offersData[0].triggerType === "SPECIFIC_PRODUCTS") {
+            selectableOfferProducts = offersData[0].specificOfferProducts
+              .filter((p: Product) => p.id !== productId)
+              .map((op: Product) => ({
+                ...op,
+                disabled: false,
+                checked: true,
+              })) as SelectableOfferProduct[];
+
+            currentProduct = {
+              ...offersData[0].specificTriggerProducts.filter((p) => p.id === productId)[0],
               disabled: false,
               checked: true,
-            })) as SelectableOfferProduct[];
+            } as SelectableOfferProduct;
 
-          const currentProduct = {
-            ...offersData[0].specificTriggerProducts.filter((p) => p.id === productId)[0],
-            disabled: false,
-            checked: true,
-          } as SelectableOfferProduct;
-
-          setSelectedOfferProducts([currentProduct, ...selectableOfferProducts]);
+            setSelectedOfferProducts([currentProduct, ...selectableOfferProducts]);
+          }
         }
       }
+
+
     } catch (error) {
       console.log("error: ", error);
       toast.error("Something went wrong. Please try again.");
@@ -122,6 +148,8 @@ export default function FreqBoughtTogether() {
     // if extension is not deployed then use hardcoded data
     else {
       import("../utils/offerData").then((module) => {
+        module.offers.sort((a, b) => b.offerPriority - a.offerPriority);
+        console.log('module.offers: ', module.offers);
         setOffer(module.offers[0]);
         if (module.offers[0]?.specificOfferProducts?.length) {
           const productId = "gid://shopify/Product/7823628435545";
@@ -190,10 +218,10 @@ export default function FreqBoughtTogether() {
               {/* Plus Icon */}
               {(i < offer.specificOfferProducts.length - 1 ||
                 i < offer.specificOfferProducts.length) && (
-                <div className="flex w-full justify-center items-center">
-                  <Plus className="size-[1em] py-0.5" />
-                </div>
-              )}
+                  <div className="flex w-full justify-center items-center">
+                    <Plus className="size-[1em] py-0.5" />
+                  </div>
+                )}
             </div>
           ))}
       </div>
@@ -203,7 +231,7 @@ export default function FreqBoughtTogether() {
         <span className="space-x-2">
           <span> Total price</span>
           <span>{rupeeFormatter(discountedTotalPrice)}</span>
-          {offerIsApplied && (
+          {offerIsApplied && offer.discount?.type && (
             <span className="line-through text-[0.8em]">{rupeeFormatter(totalPrice)}</span>
           )}
         </span>
@@ -219,11 +247,10 @@ export default function FreqBoughtTogether() {
         <button
           disabled={!offerIsApplied}
           type="submit"
-          className={`w-full text-[15px] border rounded-sm p-5 mt-6${
-            !offerIsApplied
-              ? "text-gray-600 border-gray-400 border"
-              : "text-black border-black hover:border-2"
-          }`}
+          className={`w-full text-[15px] border rounded-sm p-5 mt-6${!offerIsApplied
+            ? "text-gray-600 border-gray-400 border"
+            : "text-black border-black hover:border-2"
+            }`}
         >
           Add to Cart
         </button>
