@@ -20,6 +20,7 @@ function App() {
         console.log("Aborting installing Frequently Bought Together widget from App Embed block.");
         setFreqBoughtTogetherBlockPresent(true);
       }
+
       if (
         windowObj.ShopifyAnalytics.meta.page.pageType === "product" ||
         window.location.href.includes(productsPath)
@@ -29,7 +30,7 @@ function App() {
       }
 
       console.log("Registered Cart change listeners");
-      registerCartChangeListeners();
+      registerCartChangeListeners(import.meta.env.VITE_STOREFRONT_ACCESS_TOKEN || "");
     }
   }, []);
 

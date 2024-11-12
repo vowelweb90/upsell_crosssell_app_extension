@@ -72,7 +72,7 @@ export interface XMLHttpRequestType {
   _url?: string;
 }
 
-interface CartItem {
+export interface CartItem {
   product_id: number;
   variant_id: number;
   id: string;
@@ -110,6 +110,8 @@ export type ResponseDiscountData = {
   triggerProduct: string;
   value: { percentage: number } | { discountAmount: { amount: number } };
   items: {
-    products: { id: string; title: string }[];
-  };
+    id: string;
+    variantId: string;
+    title: string;
+  }[];
 };

@@ -63,11 +63,8 @@ export default function FreqBoughtTogether() {
           // Save discount data to localStorage
           localStorage.setItem("vw-upsell-crosssell-discount", JSON.stringify(discountData));
 
-          let data;
           // Add Offer Products to cart
-          if (success) data = await addProductsToCart(selectedOfferProducts);
-
-          console.log("AddToCart data: ", data);
+          if (success) await addProductsToCart(selectedOfferProducts);
 
           // Update discount codes in cart
           const updateCartResponse = await updateCartDiscountCodes(discountData);
@@ -84,42 +81,42 @@ export default function FreqBoughtTogether() {
     }
   };
 
+  const _fetchOffers = async () => {
+    try {
+      const { data: offersData, productId } = await fetchOffers(types);
+
+      // setOffers(offersData || []);
+
+      if (offersData?.length) {
+        setOffer(offersData[0]);
+
+        if (offersData[0].specificOfferProducts.length) {
+          const selectableOfferProducts = offersData[0].specificOfferProducts
+            .filter((p: Product) => p.id !== productId)
+            .map((op: Product) => ({
+              ...op,
+              disabled: false,
+              checked: true,
+            })) as SelectableOfferProduct[];
+
+          const currentProduct = {
+            ...offersData[0].specificTriggerProducts.filter((p) => p.id === productId)[0],
+            disabled: false,
+            checked: true,
+          } as SelectableOfferProduct;
+
+          setSelectedOfferProducts([currentProduct, ...selectableOfferProducts]);
+        }
+      }
+    } catch (error) {
+      console.log("error: ", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
   useEffect(() => {
     // If extension is deployed then fetch data from app
     if (import.meta.env.PROD) {
-      const _fetchOffers = async () => {
-        try {
-          const { data: offersData, productId } = await fetchOffers(types);
-
-          // setOffers(offersData || []);
-
-          if (offersData?.length) {
-            setOffer(offersData[0]);
-
-            if (offersData[0].specificOfferProducts.length) {
-              const selectableOfferProducts = offersData[0].specificOfferProducts
-                .filter((p: Product) => p.id !== productId)
-                .map((op: Product) => ({
-                  ...op,
-                  disabled: false,
-                  checked: true,
-                })) as SelectableOfferProduct[];
-
-              const currentProduct = {
-                ...offersData[0].specificTriggerProducts.filter((p) => p.id === productId)[0],
-                disabled: false,
-                checked: true,
-              } as SelectableOfferProduct;
-
-              setSelectedOfferProducts([currentProduct, ...selectableOfferProducts]);
-            }
-          }
-        } catch (error) {
-          console.log("error: ", error);
-          toast.error("Something went wrong. Please try again.");
-        }
-      };
-
       _fetchOffers();
     }
     // if extension is not deployed then use hardcoded data

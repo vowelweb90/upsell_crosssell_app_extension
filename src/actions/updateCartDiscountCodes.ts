@@ -36,7 +36,7 @@ export const updateCartDiscountCodes = async (discountData: ResponseDiscountData
     const cartDiscountCodesUpdate = {
       query: cardDiscountCodesUpdate,
       variables: {
-        discountCodes: [discountData.code],
+        discountCodes: discountData.code ? [discountData.code] : [],
         id: cartId,
       },
     };
