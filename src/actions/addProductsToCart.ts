@@ -7,7 +7,7 @@ export const addProductsToCart = async (products: SelectableOfferProduct[]) => {
       .filter((p) => p.checked)
       .map((p) => {
         const id = p.variantId
-          ? p.variantId.replace("gid://shopify/ProductVariant/", "")
+          ? Number(p.variantId.replace("gid://shopify/ProductVariant/", ""))
           : p._id.replace("gid://shopify/Product/", "");
         return {
           id,
@@ -26,7 +26,11 @@ export const addProductsToCart = async (products: SelectableOfferProduct[]) => {
       },
       body: JSON.stringify({ items }),
     });
+    console.log("res: ", res);
+
     const data = await res.json();
+
+    console.log("data: ", data);
 
     if (res.status >= 400) toast.error("Something went wrong. please try again.");
     else if (res.status >= 500) toast.error("Server Error");

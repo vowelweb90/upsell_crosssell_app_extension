@@ -18,6 +18,16 @@ export const createDiscountCode = async (
         amount: offer.discount.percentageFixValue.amount,
       };
     }
+    if (offer.discount?.type === "FREE_CHEAP_ITEM") {
+      let lowestPrice = offer.specificOfferProducts?.length && offer.specificOfferProducts[0].price;
+      offer.specificOfferProducts.forEach((o) => {
+        if (o.price < lowestPrice) lowestPrice = o.price;
+      });
+      value = {
+        type: "FIXED",
+        amount: lowestPrice,
+      };
+    }
 
     const combinesWith = {
       productDiscounts: offer.discount?.discountCombinations.includes("productDiscounts") || false,

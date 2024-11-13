@@ -8,6 +8,7 @@ export default function OfferProductsList({
   onChange: (id: string, checked: boolean) => void;
   product: SelectableOfferProduct;
 }) {
+  console.log('product: ', product);
   return (
     <div className="w-full rounded-md p-2 border border-gray-300 flex">
       {/* CheckBox */}

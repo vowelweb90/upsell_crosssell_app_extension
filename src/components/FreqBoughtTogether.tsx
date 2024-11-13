@@ -1,5 +1,5 @@
 import { FormEvent, FormEventHandler, useEffect, useState } from "react";
-import { Offer, Product, SelectableOfferProduct, WindowType } from "../../types";
+import { Offer, Product, SelectableOfferProduct, } from "../../types";
 import { percentFormatter, rupeeFormatter } from "../utils/lib";
 import { Plus } from "lucide-react";
 import OfferProductsList from "./OfferProductsList";
@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import addProductsToCart from "../actions/addProductsToCart";
 import createDiscountCode from "../actions/createDiscountCode";
 import { updateCartDiscountCodes } from "../actions/updateCartDiscountCodes";
-import { getProduct } from "../actions/getProduct";
 
 export default function FreqBoughtTogether() {
   const [offer, setOffer] = useState<Offer | null | undefined>();
@@ -97,22 +96,22 @@ export default function FreqBoughtTogether() {
       if (offersData?.length) {
         setOffer(offersData[0]);
         if (offersData[0].specificOfferProducts.length) {
-          if (offersData[0].triggerType === "TAGS") {
-            const windowObj = window as WindowType
-            const product = await getProduct(windowObj.ShopifyAnalytics.meta.product.id)
-            let selectableOfferProducts = []
-            let currentProduct = null;
-            if (product.tags.some(t => offersData[0].tags?.includes(t))) {
-              // 
-              selectableOfferProducts = offersData[0].specificOfferProducts
-                .filter((p: Product) => p.id !== productId)
-                .map((op: Product) => ({
-                  ...op,
-                  disabled: false,
-                  checked: true,
-                })) as SelectableOfferProduct[];
-            }
-          }
+          let selectableOfferProducts = []
+          let currentProduct = null;
+          // if (offersData[0].triggerType === "TAGS") {
+          //   const windowObj = window as WindowType
+          //   const product = await getProduct(windowObj.ShopifyAnalytics.meta.product.id)
+          //   if (product.tags.some(t => offersData[0].tags?.includes(t))) {
+          //     // 
+          //     selectableOfferProducts = offersData[0].specificOfferProducts
+          //       .filter((p: Product) => p.id !== productId)
+          //       .map((op: Product) => ({
+          //         ...op,
+          //         disabled: false,
+          //         checked: true,
+          //       })) as SelectableOfferProduct[];
+          //   }
+          // }
           if (offersData[0].triggerType === "SPECIFIC_PRODUCTS") {
             selectableOfferProducts = offersData[0].specificOfferProducts
               .filter((p: Product) => p.id !== productId)
@@ -188,6 +187,13 @@ export default function FreqBoughtTogether() {
           offer.discount.percentageFixValue.unit === "FIXED"
         ) {
           amount = offer.discount.percentageFixValue.amount;
+        } else if (
+          offer.discount.type === "FREE_CHEAP_ITEM"
+        ) {
+          amount = offer.specificOfferProducts.length ? offer.specificOfferProducts[0].price : 99999999
+          offer.specificOfferProducts.forEach(p => {
+            if (p.price < amount) amount = p.price;
+          });
         }
         setDiscountAmount(amount);
       }
@@ -200,10 +206,10 @@ export default function FreqBoughtTogether() {
     <form onSubmit={handleOnSubmit} className="flex flex-col w-full space-y-[16px] text-gray-800">
       <div className="flex flex-col">
         {/* Widget Title */}
-        <h3 className=" font-medium mb-1 text-gray-700 text-[1.3em]">Frequently Bought Together</h3>
+        <h3 className=" font-medium mb-1 text-gray-700 text-[1.3em]">{offer.widgetTitle || "Frequently Bought Together"}</h3>
 
         {/* Widget subtitle */}
-        {offerIsApplied && <p>Text below widget title.</p>}
+        {offerIsApplied && <p>{offer?.discount?.discountText || "Text below widget title."}</p>}
       </div>
 
       {/* Offer Products */}
@@ -235,7 +241,7 @@ export default function FreqBoughtTogether() {
             <span className="line-through text-[0.8em]">{rupeeFormatter(totalPrice)}</span>
           )}
         </span>
-        {offerIsApplied && offer?.discount?.type === "PERCENTAGE_OR_FIXED" && (
+        {offerIsApplied && (offer?.discount?.type === "PERCENTAGE_OR_FIXED" || offer?.discount?.type === "FREE_CHEAP_ITEM") && (
           <span className="text-[80%]">
             ({" "}
             {offer?.discount?.percentageFixValue?.unit === "PERCENT"
